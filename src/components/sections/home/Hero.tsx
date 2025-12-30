@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { useSmartNavigation } from '@/hooks/useSmartNavigation';
 
 const DEFAULT_HERO = {
-  badge: 'New Release 1',
+  badge: 'New Release 2',
   title: 'Simple Solutions That Just Work',
   subtitle:
     'Powerful tools designed for everyone. No complexity, no hassle—just reliable results when you need them most.',
