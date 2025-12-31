@@ -48,15 +48,28 @@ export default function Hero(props: HeroProps) {
   };
 
   return (
-    <section id="hero" className="bg-background text-foreground py-20 lg:py-32">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-          {/* Content Column */}
+    <section
+      id="hero"
+      className="relative min-h-screen flex items-center justify-center text-foreground py-20 lg:py-32"
+      style={{
+        backgroundImage:
+          'url(https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      {/* Background overlay for better text readability */}
+      <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Content */}
           <div
             className={`space-y-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
           >
             {/* Badge */}
-            <div className="flex justify-start">
+            <div className="flex justify-center">
               <Badge
                 variant="secondary"
                 className="bg-accent text-accent-foreground px-4 py-2 text-sm font-medium"
@@ -67,21 +80,24 @@ export default function Hero(props: HeroProps) {
             </div>
 
             {/* Headline */}
-            <div className="space-y-4">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
+            <div className="space-y-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight">
                 <span data-editable="title">{config.title}</span>
               </h1>
-              <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
+              <p className="text-xl sm:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
                 <span data-editable="subtitle">{config.subtitle}</span>
               </p>
             </div>
 
             {/* Features List */}
-            <div className="space-y-3">
+            <div className="flex flex-wrap justify-center gap-6 py-4">
               {config.features.map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-3">
+                <div
+                  key={idx}
+                  className="flex items-center gap-3 bg-background/50 backdrop-blur-sm rounded-lg px-4 py-2"
+                >
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                  <span className="text-foreground" data-editable={`features[${idx}]`}>
+                  <span className="text-foreground font-medium" data-editable={`features[${idx}]`}>
                     {feature}
                   </span>
                 </div>
@@ -89,13 +105,13 @@ export default function Hero(props: HeroProps) {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button
                 size="lg"
                 onClick={handlePrimaryClick}
                 data-editable-href="primaryCtaHref"
                 data-href={config.primaryCtaHref}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg font-semibold group"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-6 text-lg font-semibold group shadow-lg"
               >
                 <span data-editable="primaryCtaText">{config.primaryCtaText}</span>
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -107,40 +123,21 @@ export default function Hero(props: HeroProps) {
                 onClick={handleSecondaryClick}
                 data-editable-href="secondaryCtaHref"
                 data-href={config.secondaryCtaHref}
-                className="border-border text-foreground hover:bg-accent hover:text-accent-foreground px-8 py-6 text-lg font-semibold"
+                className="border-border bg-background/50 backdrop-blur-sm text-foreground hover:bg-accent hover:text-accent-foreground px-8 py-6 text-lg font-semibold shadow-lg"
               >
                 <span data-editable="secondaryCtaText">{config.secondaryCtaText}</span>
               </Button>
             </div>
 
             {/* Social Proof */}
-            <div className="pt-8 border-t border-border">
-              <p className="text-sm text-muted-foreground flex items-center gap-2">
-                <Shield className="w-4 h-4" />
-                <span data-editable="socialProof">{config.socialProof}</span>
-              </p>
+            <div className="pt-8">
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg px-6 py-4 inline-flex items-center gap-3">
+                <Shield className="w-5 h-5 text-primary" />
+                <p className="text-sm text-muted-foreground">
+                  <span data-editable="socialProof">{config.socialProof}</span>
+                </p>
+              </div>
             </div>
-          </div>
-
-          {/* Image Column */}
-          <div
-            className={`transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-          >
-            <Card className="bg-card border-border overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-0">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <Image
-                    src={config.heroImageUrl}
-                    alt={config.heroImageAlt}
-                    data-editable-src="heroImageUrl"
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-700"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent" />
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
