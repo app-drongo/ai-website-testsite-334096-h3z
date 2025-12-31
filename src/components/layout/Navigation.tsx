@@ -1,19 +1,20 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
 import { useSmartNavigation } from '@/hooks/useSmartNavigation';
 
 const DEFAULT_NAVIGATION = {
-  brandName: 'TechFlow',
-  ctaText: 'Get Started',
-  ctaHref: '/signup',
-  navItems: [
+  brand: 'TestSite',
+  links: [
     { label: 'Home', href: '#hero' },
     { label: 'Pricing', href: '#pricing' },
+    { label: 'Contact', href: '#contact' },
   ],
+  ctaText: 'Get Started',
+  ctaHref: '#contact',
 } as const;
 
 type NavigationProps = Partial<typeof DEFAULT_NAVIGATION>;
@@ -22,8 +23,17 @@ export default function Navigation(props: NavigationProps) {
   const config = { ...DEFAULT_NAVIGATION, ...props };
   const navigate = useSmartNavigation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  const handleNavClick = (href: string) => {
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleLinkClick = (href: string) => {
     navigate(href);
     setIsOpen(false);
   };
@@ -34,28 +44,37 @@ export default function Navigation(props: NavigationProps) {
   };
 
   return (
-    <section id="navigation" className="bg-background text-foreground border-b border-border">
-      <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-background/95 backdrop-blur-md border-b border-border shadow-sm'
+          : 'bg-transparent'
+      }`}
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
           <div className="flex-shrink-0">
-            <h1 className="text-xl font-bold text-primary">
-              <span data-editable="brandName">{config.brandName}</span>
-            </h1>
+            <button
+              onClick={() => handleLinkClick('#hero')}
+              className="text-xl font-bold text-foreground hover:text-primary transition-colors"
+            >
+              <span data-editable="brand">{config.brand}</span>
+            </button>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              {config.navItems.map((item, idx) => (
+              {config.links.map((link, idx) => (
                 <button
                   key={idx}
-                  onClick={() => handleNavClick(item.href)}
-                  data-editable-href={`navItems[${idx}].href`}
-                  data-href={item.href}
-                  className="text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  onClick={() => handleLinkClick(link.href)}
+                  data-editable-href={`links[${idx}].href`}
+                  data-href={link.href}
+                  className="text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
                 >
-                  <span data-editable={`navItems[${idx}].label`}>{item.label}</span>
+                  <span data-editable={`links[${idx}].label`}>{link.label}</span>
                 </button>
               ))}
             </div>
@@ -67,7 +86,7 @@ export default function Navigation(props: NavigationProps) {
               onClick={handleCtaClick}
               data-editable-href="ctaHref"
               data-href={config.ctaHref}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors duration-200"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <span data-editable="ctaText">{config.ctaText}</span>
             </Button>
@@ -77,49 +96,30 @@ export default function Navigation(props: NavigationProps) {
           <div className="md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-border hover:bg-accent hover:text-accent-foreground"
-                  aria-label="Open navigation menu"
-                >
-                  <Menu className="h-5 w-5" />
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent
-                side="right"
-                className="bg-card text-card-foreground w-[300px] sm:w-[400px]"
-              >
-                <div className="flex flex-col space-y-6 mt-6">
-                  {/* Mobile Brand */}
-                  <div className="pb-4 border-b border-border">
-                    <h2 className="text-lg font-bold text-primary">
-                      <span data-editable="brandName">{config.brandName}</span>
-                    </h2>
-                  </div>
-
-                  {/* Mobile Navigation Links */}
-                  <div className="flex flex-col space-y-4">
-                    {config.navItems.map((item, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleNavClick(item.href)}
-                        data-editable-href={`navItems[${idx}].href`}
-                        data-href={item.href}
-                        className="text-left text-foreground hover:text-primary px-4 py-3 text-base font-medium transition-colors duration-200 hover:bg-accent hover:bg-accent/50 rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
-                      >
-                        <span data-editable={`navItems[${idx}].label`}>{item.label}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Mobile CTA */}
-                  <div className="pt-4 border-t border-border">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <div className="flex flex-col space-y-4 mt-8">
+                  {config.links.map((link, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleLinkClick(link.href)}
+                      data-editable-href={`links[${idx}].href`}
+                      data-href={link.href}
+                      className="text-foreground hover:text-primary px-3 py-2 text-left text-lg font-medium transition-colors"
+                    >
+                      <span data-editable={`links[${idx}].label`}>{link.label}</span>
+                    </button>
+                  ))}
+                  <div className="pt-4">
                     <Button
                       onClick={handleCtaClick}
                       data-editable-href="ctaHref"
                       data-href={config.ctaHref}
-                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors duration-200"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       <span data-editable="ctaText">{config.ctaText}</span>
                     </Button>
@@ -129,7 +129,7 @@ export default function Navigation(props: NavigationProps) {
             </Sheet>
           </div>
         </div>
-      </nav>
-    </section>
+      </div>
+    </nav>
   );
 }
